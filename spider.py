@@ -50,6 +50,13 @@ class Spider:
 
         self.downloader = Downloader(self.loop)
         self.downloader.timeout = conf.SPIDER['timeout']
+
+        self.pipelines = []
+
+        for pipeline_path in sorted(conf.PIPELINES):
+            pipeline_cls = load_object(pipeline_path)
+            self.piplelines.append(pipeline_cls())
+
         self._concurrency = 1
 
     @property
@@ -103,8 +110,7 @@ class Spider:
                                       node['id'], response)
                     items = self.parse(response)
                     for item in items:
-                        for pipeline_path in sorted(settings.PIPELINES):
-                            pipeline = load_object(pipeline_path)
+                        for pipeline in self.pipelines:
                             pipeline.process_item(item)
                     self.logger.info('Node %s succeeded, retried %s times',
                                      node['id'], node['retry'])
@@ -136,10 +142,8 @@ class Spider:
         await asyncio.gather(*workers, return_exceptions=True)
 
     def launch(self):
-        for pipeline_path in sorted(conf.PIPELINES):
-            pipeline = load_object(pipeline_path)
+        for pipeline in self.pipelines:
             pipeline.open_spider()
-        # pipeline.open_spider
         self.log_queue_listener.start()
         self.logger.info('%s spider launched', self.name)
         try:
@@ -155,9 +159,7 @@ class Spider:
         self.loop.run_until_complete(session_closed)
         self.loop.close()
 
-        for pipeline_path in sorted(conf.PIPELINES):
-            pipeline_cls = load_object(pipeline_path)
-            pipeline = pipeline_cls()
+        for pipeline in self.pipelines:
             pipeline.close_spider()
 
         self.log_queue_listener.stop()
