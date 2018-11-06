@@ -198,19 +198,6 @@ class Spider:
 
         return log_queue_listener, logger
 
-    def _get_mailer(self):
-        mailer = smtplib.SMTP()
-
-        return mailer
-
-    def _get_email_message(self):
-        email_message = EmailMessage()
-        email_message['Subject'] = 'settings'
-        email_message['From'] = 'settings'
-        email_message['To'] = 'settings'
-
-        return email_message
-
 
 if __name__ == '__main__':
     from item import Node
