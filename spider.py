@@ -10,6 +10,7 @@ import smtplib
 from email.message import EmailMessage
 
 from downloader import Downloader
+from mailer import Mailer
 from utils import load_object
 import conf
 
@@ -40,8 +41,10 @@ class Spider:
         self.log_queue = queue.Queue(-1)
         self.log_queue_listener, self.logger = self._get_logger()
 
-        self.mailer = self._get_mailer()
-        self.email_message = self._get_email_message()
+        self.mailer = Mailer()
+        self.mailer.envelope['Subject'] = conf.EMAIL['Subject']
+        self.mailer.envelope['To'] = conf.EMAIL['To']
+        self.mailer.envelope['From'] = conf.EMAIl['From']
 
         self.downloader = Downloader(self.loop)
         self.downloader.timeout = conf.SPIDER['timeout']

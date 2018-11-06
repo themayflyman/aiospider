@@ -24,3 +24,9 @@ SPIDER = {
 PIPELINES = []
 
 EXCEPTIONS = []
+
+EMAIL = {
+        'Subject': None,
+        'To': None,
+        'From': None
+        }
