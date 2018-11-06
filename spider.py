@@ -29,7 +29,7 @@ class Spider:
     name = ''
     enable_proxy = False
 
-    def __init__(self):
+    def __init__(self, node_base):
         self.loop = asyncio.get_event_loop()
 
         self._max_retry = conf.SPIDER['max_retry']
@@ -43,13 +43,12 @@ class Spider:
         self.mailer = self._get_mailer()
         self.email_message = self._get_email_message()
 
-        if self.enable_proxy:
-            self._proxy_pool = None
-        else:
-            pass
-
         self.downloader = Downloader(self.loop)
         self.downloader.timeout = conf.SPIDER['timeout']
+        if self.enable_proxy:
+            # TODO: add proxy_pool
+            self.downloader.proxy_pool = None
+            self.set_proxy(node_base['protocol'])
 
         self.pipelines = []
 
@@ -94,7 +93,7 @@ class Spider:
         """
         Parsing the response content and returning scrapped data.
         """
-        return []
+        return list()
 
     async def worker(self):
         while True:
@@ -109,9 +108,11 @@ class Spider:
                     self.logger.debug('Node %s response content: %s',
                                       node['id'], response)
                     items = self.parse(response)
-                    for item in items:
+                    for _ in range(len(items):
+                        item = items.pop()
                         for pipeline in self.pipelines:
-                            pipeline.process_item(item)
+                            item = pipeline.process_item(item)
+                        items.append(item)
                     self.logger.info('Node %s succeeded, retried %s times',
                                      node['id'], node['retry'])
                 except Exception as exception:
@@ -209,12 +210,12 @@ class Spider:
 
 
 if __name__ == '__main__':
-    s = Spider()
     from item import Node
     n1 = Node()
     n1['id'] = 'baidu'
     n1['url'] = 'https://www.baidu.com'
     n1['method'] = 'GET'
+    s = Spider(n1)
     s.add_node(n1)
     s.launch()
     s.close()
