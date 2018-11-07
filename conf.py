@@ -11,7 +11,7 @@ DEBUG = logging.DEBUG
 
 LOG = {
         'log_level': INFO,
-        'log_path': 'spider_log.log',
+        'log_path': 'log.log',
       }
 
 
@@ -26,7 +26,19 @@ PIPELINES = []
 EXCEPTIONS = []
 
 EMAIL = {
+        'host': None,
+        'port': 0,
+        'use_ssl': False,
+        'usr': '',
+        'pwd': '',
         'Subject': None,
         'To': None,
         'From': None
         }
+
+DATABASE = {
+             'mongodb': {'mongodb_connect_string': '',
+                         'database': '',
+                         'collection': ''}
+             'mysql': {'mysql_connect_string': ''}
+           }
