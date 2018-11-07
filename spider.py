@@ -21,7 +21,7 @@ except ImportError:
     pass
 
 
-# TODO(@JoJo): settings, ProxyIPPool
+# TODO(@JoJo): ProxyIPPool, test
 class Spider:
     """
     A spider class for crawling jobs, costume the settings in settings.py
@@ -41,7 +41,12 @@ class Spider:
         self.log_queue = queue.Queue(-1)
         self.log_queue_listener, self.logger = self._get_logger()
 
-        self.mailer = Mailer()
+        self.mailer = Mailer(conf.EMAIl['host'],
+                             conf.EMAIL['port'],
+                             conf.EMAIL['use_ssl'],
+                             conf.EMAIL['usr'],
+                             conf.EMAIL['pwd'],
+                             conf.SPIDER['timeout'])
         self.mailer.envelope['Subject'] = conf.EMAIL['Subject']
         self.mailer.envelope['To'] = conf.EMAIL['To']
         self.mailer.envelope['From'] = conf.EMAIl['From']
@@ -168,7 +173,7 @@ class Spider:
 
         self.log_queue_listener.stop()
 
-        # self.mailer.quit()
+        self.mailer.close()
         self.logger.info('%s spider closed', self.name)
 
     def _get_logger(self):

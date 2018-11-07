@@ -28,13 +28,13 @@ class Mailer:
         self._usr = usr
         self._pwd = pwd
 
-    def send(self, to=None, from=None, subject=None, msg):
+    def send(self, to_addr=None, from_addr=None, subject=None, msg):
         if self._usr and self._pwd:
             self.server.login(self._usr, self._pwd)
-        if to and from and subject:
+        if to_addr and from_addr and subject:
             self.envelope['Subject'] = subject
-            self.envelope['From'] = from
-            self.envelope['To'] to
+            self.envelope['From'] = from_addr
+            self.envelope['To'] = to_addr
         self.envelope.set_content(msg)
 
         s.send_message(self.envelope)
