@@ -39,6 +39,6 @@ EMAIL = {
 DATABASE = {
              'mongodb': {'mongodb_connect_string': '',
                          'database': '',
-                         'collection': ''}
+                         'collection': ''},
              'mysql': {'mysql_connect_string': ''}
            }

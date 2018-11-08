@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import stmlib
+import smtplib
 from email.message import EmailMessage
 
 
@@ -28,7 +28,7 @@ class Mailer:
         self._usr = usr
         self._pwd = pwd
 
-    def send(self, to_addr=None, from_addr=None, subject=None, msg):
+    def send(self, msg, to_addr=None, from_addr=None, subject=None):
         if self._usr and self._pwd:
             self.server.login(self._usr, self._pwd)
         if to_addr and from_addr and subject:

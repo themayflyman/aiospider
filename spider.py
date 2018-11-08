@@ -6,10 +6,9 @@ import asyncio
 import queue
 import logging
 from logging.handlers import QueueHandler, QueueListener
-import smtplib
-from email.message import EmailMessage
 
 from downloader import Downloader
+from proxy_pool import ProxyPool
 from mailer import Mailer
 from utils import load_object
 import conf
@@ -41,7 +40,7 @@ class Spider:
         self.log_queue = queue.Queue(-1)
         self.log_queue_listener, self.logger = self._get_logger()
 
-        self.mailer = Mailer(conf.EMAIl['host'],
+        self.mailer = Mailer(conf.EMAIL['host'],
                              conf.EMAIL['port'],
                              conf.EMAIL['use_ssl'],
                              conf.EMAIL['usr'],
@@ -49,20 +48,19 @@ class Spider:
                              conf.SPIDER['timeout'])
         self.mailer.envelope['Subject'] = conf.EMAIL['Subject']
         self.mailer.envelope['To'] = conf.EMAIL['To']
-        self.mailer.envelope['From'] = conf.EMAIl['From']
+        self.mailer.envelope['From'] = conf.EMAIL['From']
 
         self.downloader = Downloader(self.loop)
         self.downloader.timeout = conf.SPIDER['timeout']
         if self.enable_proxy:
-            # TODO: add proxy_pool
-            self.downloader.proxy_pool = None
-            self.set_proxy(node_base['protocol'])
+            self.downloader.proxy_pool = ProxyPool()
+            self.downloader.set_proxy(node_base['protocol'])
 
         self.pipelines = []
 
         for pipeline_path in sorted(conf.PIPELINES):
             pipeline_cls = load_object(pipeline_path)
-            self.piplelines.append(pipeline_cls())
+            self.pipelines.append(pipeline_cls())
 
         self._concurrency = 1
 
@@ -116,7 +114,7 @@ class Spider:
                     self.logger.debug('Node %s response content: %s',
                                       node['id'], response)
                     items = self.parse(response)
-                    for _ in range(len(items):
+                    for _ in range(len(items)):
                         item = items.pop()
                         for pipeline in self.pipelines:
                             item = pipeline.process_item(item)
