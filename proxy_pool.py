@@ -27,17 +27,11 @@ class ProxyPool:
 class Proxy:
     """ A proxy class to represent proxy ip """
 
-    def __init__(self, host=None, port=None, protocol=None, *args):
+    def __init__(self, host, port, protocol):
+        # TODO: pass a string and convert it by extracting the host, port and proctol
         self._host = host
         self._port = port
         self._protocol = protocol
-        if args and isinstance(args, str):
-            try:
-                self._protocol = args.split('://')[0]
-                self._host = args.split('://')[1].split(':')[0]
-                self._port = args.split('://')[1].split(':')[1]
-            except IndexError:
-                raise ValueError('illegal format of {}'.format(args))
 
     @property
     def host(self):
@@ -57,7 +51,7 @@ class Proxy:
 
     @property
     def protocol(self):
-        self._protocol = protocol
+        return self._protocol
 
     @protocol.setter
     def protocol(self, protocol):
@@ -71,7 +65,7 @@ class Proxy:
 
     def check(self):
         proxy = {
-                'http': self.host + ':' + str(self.port)
+                'http': self.host + ':' + str(self.port),
                 'https': self.host + ':' + str(self.port)
         }
         try:
@@ -92,4 +86,10 @@ class Proxy:
         return 'Proxy(host={}, port={}, protocol={})'.format(self.host, 
                                                              self.port,
                                                              self.protocol)
+
+
+        
+if __name__ == '__main__':
+    p = Proxy('http://127.0.0.1:80')
+    print(p, p.host, p.port, p.protocol)
 
