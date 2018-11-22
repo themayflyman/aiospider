@@ -28,7 +28,6 @@ class Proxy:
     """ A proxy class to represent proxy ip """
 
     def __init__(self, host, port, protocol):
-        # TODO: pass a string and convert it by extracting the host, port and proctol
         self._host = host
         self._port = port
         self._protocol = protocol
