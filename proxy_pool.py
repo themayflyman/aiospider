@@ -3,21 +3,22 @@
 from requests import request, RequestException
 
 class ProxyPool:
-    proxy_pool = []
 
-    def __init__(self, logger):
-        logger.info('Initalizing proxy pool')
-        self.update(protocol)
+    def __init__(self):
+        self.proxy_pool = []
+        self.update()
 
 
-    def get(self, protocol=None):
+    def get(self):
         # if the pool consists of less than 5 proxies, update
         if len(self.proxy_pool) < 5:
-            self.update(protocol)
-        return self.proxy_pool.pop()
+            self.update()
+        # proxy = self.proxy_pool.pop()
+        # return proxy
 
 
-    def update(self, protocol):
+    def update(self):
+        # put Proxy() in proxy_pool
         pass
 
     def delete(self, proxy):
@@ -27,10 +28,22 @@ class ProxyPool:
 class Proxy:
     """ A proxy class to represent proxy ip """
 
-    def __init__(self, host, port, protocol):
-        self._host = host
-        self._port = port
-        self._protocol = protocol
+    def __init__(self, string=None, **kw):
+        if string:
+            try:
+                self._protocol = string.split('://')[0]
+                self._host = string.split('://')[1].split(':')[0]
+                self._port = string.split('://')[1].split(':')[1]
+            except IndexError:
+                raise ValueError('illegal string: {}'.format(string))
+        elif kw:
+            self._protocol = kw['protocol']
+            self._host = kw['host']
+            self._port = kw['port']
+        else:
+            self._protocol = None
+            self._host = None
+            self._port = None
 
     @property
     def host(self):
@@ -89,6 +102,6 @@ class Proxy:
 
         
 if __name__ == '__main__':
-    p = Proxy('http://127.0.0.1:80')
-    print(p, p.host, p.port, p.protocol)
-
+    p = Proxy(protocol='https',host='127.0.0.1',port='1080')
+    p1 = Proxy('https://127.0.0.1:1080')
+    print(str(p), str(p1))
