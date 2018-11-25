@@ -12,8 +12,7 @@ class Downloader:
 
         self.session = loop.run_until_complete(self._create_session())
 
-        self.proxy = {'http': None,
-                      'https': None}
+        self.proxy = ''
 
         self.headers = {}
         self.proxy_pool = None
@@ -33,16 +32,15 @@ class Downloader:
         else:
             raise ValueError('timeout must be a integer.')
 
-    def set_proxy(self, protocol):
-        self.proxy[protocol] = self.proxy_pool.get(protocol)
+    def set_proxy(self):
+        self.proxy = self.proxy_pool.get()
 
     async def download(self, node):
-        proxy = self.proxy.get(node.get('protocol'))
         async with self.session.request(method=node.get('method'), 
                                         url=node.get('url'), 
                                         data=node.get('data'),
                                         json=node.get('json'), 
-                                        proxy=proxy,
+                                        proxy=self.proxy,
                                         headers=self.headers) as resp:
             return await resp
 

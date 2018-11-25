@@ -29,7 +29,7 @@ class Spider:
     name = ''
     enable_proxy = False
 
-    def __init__(self, node_base):
+    def __init__(self):
         self.loop = asyncio.get_event_loop()
 
         self._max_retry = conf.SPIDER['max_retry']
@@ -54,7 +54,7 @@ class Spider:
         self.downloader.timeout = conf.SPIDER['timeout']
         if self.enable_proxy:
             self.downloader.proxy_pool = ProxyPool()
-            self.downloader.set_proxy(node_base['protocol'])
+            self.downloader.set_proxy()
 
         self.pipelines = []
 
@@ -208,7 +208,7 @@ if __name__ == '__main__':
     n1['id'] = 'baidu'
     n1['url'] = 'https://www.baidu.com'
     n1['method'] = 'GET'
-    s = Spider(n1)
+    s = Spider()
     s.add_node(n1)
     s.launch()
     s.close()
