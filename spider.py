@@ -20,7 +20,7 @@ except ImportError:
     pass
 
 
-# TODO(@JoJo): ProxyIPPool, test
+# TODO(@JoJo): test
 class Spider:
     """
     A spider class for crawling jobs, costume the settings in settings.py
@@ -98,10 +98,22 @@ class Spider:
     def parse(self, response=None):
         """
         Parsing the response content and returning scrapped data.
+
+        Args:
+            response: the response object passed from the downloader
+        
+        Returns:
+            list: a list of items of scrapped data
         """
         return list()
 
     async def worker(self):
+        """
+        A worker coroutine that fetch a node from node_queue each time and
+        process it. If the node is failed to be processed, worker will put it
+        back to the queue for retrying or put it in the failed_node_queue if
+        the retried times exceed the set retry time.
+        """
         while True:
             node = await self.nodes.get()
             if node['retry'] > self._max_retry:
@@ -133,6 +145,7 @@ class Spider:
             self.nodes.task_done()
 
     async def main(self):
+        """ Pack workers of set concurreny """
         workers = []
         for _ in range(self._concurrency):
             # In Python 3.7+
