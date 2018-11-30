@@ -6,6 +6,8 @@ import aiohttp
 
 class Downloader:
     """
+    Downloader creates a aiohttp client session and takes an event loop. 
+    To download content, simply pass a node of whose data needs to be downloaded    to the download method.
     """
     def __init__(self, loop):
         self._timeout = 0
@@ -36,6 +38,17 @@ class Downloader:
         self.proxy = self.proxy_pool.get()
 
     async def download(self, node):
+        """
+        Downloading a node and returing the http response
+
+        Params:
+            node: a node object which consists of the key information of the
+                  data we need to download
+
+        Returns:
+            response: an http response
+
+        """
         async with self.session.request(method=node.get('method'), 
                                         url=node.get('url'), 
                                         data=node.get('data'),
@@ -45,4 +58,5 @@ class Downloader:
             return await resp
 
     async def close(self):
+        """close the download session and it must be done in an event loop"""
         await self.session.close()
